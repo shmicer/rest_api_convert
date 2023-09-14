@@ -1,28 +1,31 @@
 version: "3.11"
 
 services:
-  web:
+  api:
     build:
       context: .
       dockerfile: compose/local/django/Dockerfile
     volumes:
       - .:/code
     env_file:
-      - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
+      - .envs/.local/.django
     ports:
       - "8000:8000"
-    depends_on:
-      - db
-  db:
-    image: postgres:13.0-alpine
+  redis:
+    image: redis
+    container_name: redis-container
     ports:
-      - "30333:5432"
-    restart: always
+      - "6379:6379"
+  celery:
+    build:
+      context: .
+      dockerfile: compose/local/django/Dockerfile
+    command: celery worker --app=config --loglevel=info
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - .:/code
     env_file:
-      - .envs/.local/.postgres
+      - .envs/.local/.django
+    depends_on:
+      - api
+      - redis
 
-volumes:
-  postgres_data:
