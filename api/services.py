@@ -1,9 +1,15 @@
-import requests
-from django.views.decorators.cache import cache_page
+from django.core.cache import cache
+from api.tasks import get_currency_rates_dict_task
 
-@cache_page(60 * 2)
+
+
+# def convert(from_currency, to_currency):
+#     pass
+
 def convert(from_currency, to_currency):
-    url = f'https://api.coingate.com/api/v2/rates/merchant/{from_currency}/{to_currency}'
-    headers = {"accept": "text/plain"}
-    response = requests.get(url, headers=headers)
-    return response.text
+    data = cache.get('currency_data')
+    if data is None:
+        data = get_currency_rates_dict_task()
+        cache.set('currency_data', data, 60 * 60)
+    return data[from_currency][to_currency]
+

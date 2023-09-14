@@ -74,14 +74,21 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME':  os.environ.get('POSTGRES_DB'),
+#         'USER':  os.environ.get('POSTGRES_USER'),
+#         'PASSWORD':  os.environ.get('POSTGRES_PASSWORD'),
+#         'HOST':  os.environ.get('POSTGRES_HOST'),
+#         'PORT':  os.environ.get('POSTGRES_PORT'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME':  os.environ.get('POSTGRES_DB'),
-        'USER':  os.environ.get('POSTGRES_USER'),
-        'PASSWORD':  os.environ.get('POSTGRES_PASSWORD'),
-        'HOST':  os.environ.get('POSTGRES_HOST'),
-        'PORT':  os.environ.get('POSTGRES_PORT'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'mydatabase'
     }
 }
 
@@ -148,10 +155,11 @@ CACHES = {
     'default': {
         'BACKEND': "django_redis.cache.RedisCache",
         'LOCATION': 'redis://redis:6379/1',
-        "TIMEOUT": 60 * 2,
+        "TIMEOUT": 60 * 60,
 
     }
 }
+
 
 SITE_ID = 1
 

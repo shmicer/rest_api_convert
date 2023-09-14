@@ -25,7 +25,7 @@ class ConvertApiView(APIView):
         amount = request.query_params.get('amount', None)
         if not from_currency or not to_currency or not amount:
             return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
-        converted_amount = convert(from_currency, to_currency)
+        converted_amount = format(float(convert(from_currency, to_currency)) * float(amount), '.2f')
         return Response({'detail': f'{from_currency} to {to_currency} is successfully converted.',
                          'result': converted_amount}, status=status.HTTP_200_OK)
 
