@@ -11,7 +11,7 @@ app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
     'receiving_actual_currency_rates_every_24_hours': {
-        'task': 'settings.tasks.get_currency_rates_dict_task',
-        'schedule': crontab(minute='0', hour='*'),
+        'task': 'app.tasks.get_currency_rates_dict_task',
+        'schedule': crontab(hour='11', minute='11'),
     },
 }
