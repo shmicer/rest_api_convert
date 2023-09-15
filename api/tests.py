@@ -1,5 +1,4 @@
 import requests
-import pytest
 
 ENDPOINT = 'https://0.0.0.0:8000/'
 
@@ -7,7 +6,6 @@ ENDPOINT = 'https://0.0.0.0:8000/'
 def test_connect_api():
     connect_response = connect()
     assert connect_response.status_code == 200
-
 
 
 def connect():

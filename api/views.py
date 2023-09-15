@@ -1,7 +1,7 @@
-from drf_spectacular.utils import (OpenApiParameter,
-                                   extend_schema, extend_schema_view)
-from rest_framework.response import Response
+from drf_spectacular.utils import (OpenApiParameter, extend_schema,
+                                   extend_schema_view)
 from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.services import convert
@@ -24,9 +24,9 @@ class ConvertApiView(APIView):
         to_currency = request.query_params.get('to_currency', None)
         amount = request.query_params.get('amount', None)
         if not from_currency or not to_currency or not amount:
-            return Response({'detail': 'Missing required parameters.'}, status=status.HTTP_400_BAD_REQUEST)
-        converted_amount = format(float(convert(from_currency, to_currency)) * float(amount), '.2f')
+            return Response({'detail': 'Missing required parameters.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        converted_amount = format(float(convert(from_currency, to_currency)) * float(amount),
+                                  '.2f')
         return Response({'detail': f'{from_currency} to {to_currency} is successfully converted.',
                          'result': converted_amount}, status=status.HTTP_200_OK)
-
-

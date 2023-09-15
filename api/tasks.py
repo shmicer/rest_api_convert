@@ -1,13 +1,14 @@
 import os
-
-from celery import shared_task
 import time
+
 import requests
+from celery import shared_task
 
 currencies = ['AED', 'USD', 'EUR', 'RUB', 'TRY', 'CNY', 'HKD']
 
 
 API_KEY = os.environ.get('CURRENCY_API_KEY')
+
 
 @shared_task
 def get_currency_rates_dict_task():
@@ -18,5 +19,3 @@ def get_currency_rates_dict_task():
         time.sleep(0.5)
         currencies_dict[base] = response['data']
     return currencies_dict
-
-
