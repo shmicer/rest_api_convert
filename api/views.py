@@ -9,7 +9,7 @@ from api.services import convert
 
 @extend_schema_view(
     get=extend_schema(
-        summary='Convert the currencies',
+        summary='GET request to convert between two currencies',
         parameters=[
             OpenApiParameter(name='from_currency', description='Currency to convert', type=str),
             OpenApiParameter(name='to_currency', description='Currency convert to', type=str),

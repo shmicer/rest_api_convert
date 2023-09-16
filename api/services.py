@@ -5,7 +5,6 @@ from api.tasks import get_currency_rates_dict_task
 
 def convert(from_currency, to_currency):
     data = cache.get('currency_data')
-    if data is None:
+    if not data:
         data = get_currency_rates_dict_task()
-        cache.set('currency_data', data, 60 * 60 * 24)
     return data[from_currency][to_currency]['value']
