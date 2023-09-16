@@ -1,60 +1,81 @@
 version: "3.11"
 
 services:
-  api: &api
-    container_name: api
+
+  web: &web
+    container_name: web
     build:
       context: .
       dockerfile: compose/prod/django/Dockerfile
     volumes:
-      - .:/code
-      - staticfiles:/code/static/
-    env_file:
-      - .envs/.prod/.django
+      - ./:/code
     ports:
       - "8000:8000"
+    env_file:
+      - ./.envs/.prod/.django
+    command: sh -c "python manage.py collectstatic --no-input && 
+                    python manage.py makemigrations &&
+                    python manage.py migrate &&
+                    gunicorn --workers=4 --reload --max-requests=1000 config.wsgi:application -b 0.0.0.0:8000"
+
+  nginx:
+    container_name: nginx
+    image: nginx:stable-alpine
+    working_dir: /code
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/prod/:/etc/nginx/conf.d:ro
+      - ./certbot/conf/:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    links:
+      - web
     depends_on:
-      - db
-    command: sh -c "python manage.py collectstatic --no-input &&
-      python manage.py makemigrations &&
-      python manage.py migrate &&
-      gunicorn --workers=4 --reload --max-requests=1000 config.wsgi:application -b 0.0.0.0:8000"
+      - web
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt:rw
+      - ./certbot/www:/var/www/certbot:rw
+    command: certonly --webroot --webroot-path=/var/www/certbot/ --email shmicer@gmail.com --agree-tos --no-eff-email -d test2py.ru -d www.test2py.ru
+    depends_on:
+      - nginx
+
   redis:
     image: redis
     container_name: redis-container
     ports:
       - "6379:6379"
-  worker:
-    <<: *api
-    command: celery --app=config worker --loglevel=info
-    links:
-      - redis
-    ports: [ ]
-    depends_on:
-      - api
-      - redis
-  beat:
-    <<: *api
-    command: celery --app=config beat --loglevel=info
-    ports: [ ]
-    depends_on:
-      - api
-      - redis
-  nginx:
-    container_name: nginx
-    working_dir: /code
-    image: nginx:stable-alpine
-    restart: always
-    ports:
-      - "80:80"
     volumes:
-      - ./nginx/prod/:/etc/nginx/conf.d:ro
-      - staticfiles:/code/static/
-    links:
-      - web
-    depends_on:
-      - web
+      - ./redis/data:/data
 
+  worker:
+    <<: *web
+    restart: always
+    command: celery --app=config worker --loglevel=./logs/celery-worker.log
+    links:
+      - redis
+    volumes:
+      - ./:/code
+      - media:/code/media
+    ports: [ ]
+    depends_on:
+      - redis
+
+  beat:
+    <<: *web
+    restart: always
+    command: celery --app=config beat --loglevel=./logs/celery-beat.log
+    volumes:
+      - media:/code/media
+      - ./:/code
+    depends_on:
+      - redis
 
 volumes:
-  staticfiles:
+  static:
+  media:
