@@ -3,14 +3,16 @@ version: "3.11"
 services:
 
   web: &web
-    container_name: web
+#    container_name: web
     build:
       context: .
       dockerfile: compose/prod/django/Dockerfile
     volumes:
       - ./:/code
     ports:
-      - "8000:8000"
+    - "8000:8000"
+    depends_on:
+      - redis
     env_file:
       - ./.envs/.prod/.django
     command: sh -c "python manage.py collectstatic --no-input && 
@@ -41,7 +43,7 @@ services:
     volumes:
       - ./certbot/conf:/etc/letsencrypt:rw
       - ./certbot/www:/var/www/certbot:rw
-    command: certonly --webroot --webroot-path=/var/www/certbot/ --email shmicer@gmail.com --agree-tos --no-eff-email -d test2py.ru -d www.test2py.ru
+#    command: certonly --webroot --webroot-path=/var/www/certbot/ --email shmicer@gmail.com --agree-tos --no-eff-email -d test2py.ru -d www.test2py.ru
     depends_on:
       - nginx
 
@@ -54,22 +56,27 @@ services:
       - ./redis/data:/data
 
   worker:
-    <<: *web
+    build:
+      context: .
+      dockerfile: compose/prod/django/Dockerfile
     restart: always
-    command: celery --app=config worker --loglevel=./logs/celery-worker.log
-    links:
-      - redis
+    env_file:
+      - ./.envs/.prod/.django
+    command: celery --app=config worker --loglevel=info --logfile=./logs/celery-worker.log
     volumes:
       - ./:/code
       - media:/code/media
-    ports: [ ]
     depends_on:
       - redis
 
   beat:
-    <<: *web
+    build:
+      context: .
+      dockerfile: compose/prod/django/Dockerfile
     restart: always
-    command: celery --app=config beat --loglevel=./logs/celery-beat.log
+    env_file:
+      - ./.envs/.prod/.django
+    command: celery --app=config beat --loglevel=info --logfile=./logs/celery-beat.log
     volumes:
       - media:/code/media
       - ./:/code

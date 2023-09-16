@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'rest_framework',
     'drf_spectacular',
+    'rest_framework_simplejwt',
 
 
     # Local apps
@@ -137,9 +138,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ORIGIN_ALLOW_ALL = True
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-    ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
@@ -164,6 +162,6 @@ CACHES = {
 SITE_ID = 1
 
 
-STATIC_ROOT = os.path.join(BASE_DIR, '/var/www/static')
+STATIC_ROOT = os.path.join(BASE_DIR, '/static')
 
 
