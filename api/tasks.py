@@ -5,7 +5,6 @@ import requests
 from celery import shared_task
 from django.core.cache import cache
 
-
 API_KEY = os.environ.get('CURRENCY_API_KEY')
 
 
