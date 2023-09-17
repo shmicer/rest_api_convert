@@ -20,13 +20,18 @@ from api.services import convert
 class ConvertApiView(APIView):
 
     def get(self, request):
-        from_currency = request.query_params.get('from_currency', None)
-        to_currency = request.query_params.get('to_currency', None)
+        from_currency = request.query_params.get('from_currency', None).upper()
+        to_currency = request.query_params.get('to_currency', None).upper()
         amount = request.query_params.get('amount', None)
         if not from_currency or not to_currency or not amount:
             return Response({'detail': 'Missing required parameters.'},
                             status=status.HTTP_400_BAD_REQUEST)
-        converted_amount = format(float(convert(from_currency, to_currency)) * float(amount),
+        try:
+            amount = float(amount)
+        except ValueError:
+            return Response({'detail': 'Amount must be a valid number.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        converted_amount = format(convert(from_currency, to_currency) * amount,
                                   '.2f')
         return Response({'detail': f'{from_currency} to {to_currency} is successfully converted.',
                          'result': converted_amount}, status=status.HTTP_200_OK)

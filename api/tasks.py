@@ -18,6 +18,5 @@ def get_currency_rates_dict_task():
         response = requests.get(url).json()
         currencies_dict[base] = response['data']
         time.sleep(0.5)
-    cache.clear()
     data = cache.set('currency_data', currencies_dict)
     return data

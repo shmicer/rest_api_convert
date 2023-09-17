@@ -8,4 +8,3 @@ urllib3==1.26.9
 redis==5.0.0
 django-redis==5.3.0
 celery==5.3.4
-django-cachalot==2.6.1
