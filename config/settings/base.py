@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 
+from django.core.cache.backends.redis import RedisCache
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -34,7 +36,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'rest_framework',
     'drf_spectacular',
-    'rest_framework_simplejwt',
 
 
     # Local apps
@@ -151,10 +152,9 @@ SPECTACULAR_SETTINGS = {
 
 CACHES = {
     'default': {
-        'BACKEND': "django_redis.cache.RedisCache",
+        'BACKEND': "django.core.cache.backends.redis.RedisCache",
         'LOCATION': 'redis://redis:6379/1',
         "TIMEOUT": 60 * 60 * 24,
-
     }
 }
 
